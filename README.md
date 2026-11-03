@@ -237,7 +237,7 @@ cd clipforge/backend
 python3.12 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/pip install --no-deps -r requirements-mediapipe.txt
-.venv/bin/pytest -q                 # 63 testů: zarovnání, dedup, ASS/SRT + diakritika, JSON, poskytovatelé, FFmpeg, API
+.venv/bin/pytest -q                 # 64 testů: zarovnání, dedup, ASS/SRT + diakritika, JSON, poskytovatelé, FFmpeg, API
 .venv/bin/ruff check . && .venv/bin/mypy app
 ```
 

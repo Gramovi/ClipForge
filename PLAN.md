@@ -73,7 +73,7 @@ Legenda: `[x]` hotovo a otestováno, `[ ]` zbývá, `[~]` částečně (viz pozn
 ## Fáze 10 – leštění + ověření
 - [x] Playwright E2E (registrace → upload → hotovo → klip → preset → export → stažení), konzole, mobil
 - [x] Chybové stavy: poškozený soubor, bez řeči, bez obličeje, příliš velký, chybí klíč, výpadek LLM
-- [~] E2E pipeline na 20–30min CZ + EN videu, ffprobe kontroly (viz Poznámky)
+- [x] E2E pipeline na dlouhém CZ (20 min) + EN (16 min) videu přes Docker stack, ffprobe kontroly (viz Poznámky)
 - [x] `docker compose up` (ověřeno v sandboxu; base image přes mirror kvůli rate limitu Docker Hubu)
 - [x] README (česky), build/lint/typecheck bez chyb
 - [x] Commit + push
@@ -89,3 +89,10 @@ Legenda: `[x]` hotovo a otestováno, `[ ]` zbývá, `[~]` částečně (viz pozn
   a skutečným voláním API s neplatným klíčem (→ srozumitelná chyba 401). Kvalita výběru momentů
   s Claude NEBYLA v tomto prostředí změřena; E2E běhy používaly Ollama `qwen2.5:3b` na CPU.
 - Testovací média: `scripts/make_test_media.py` (Piper TTS, 2 mluvčí, pohyb úst, střihy).
+- Výsledky testů (Docker stack, CPU 4 jádra, Ollama qwen2.5:3b):
+  - CZ 19:56, Whisper large-v3-turbo: přepis 6 min, 4 okna, 8 klipů, hranice na celých větách, české názvy/hashtagy.
+  - EN 16:13, Whisper small: 5 klipů 30–60 s, anglické názvy/hashtagy.
+  - ffprobe: H.264 High, 1080×1920, původní fps, AAC 48 kHz, délky sedí.
+  - Playwright: registrace → upload → zpracování → editor → změna presetu + oprava slova → render → MP4 → ZIP; mobil bez přetečení; konzole bez chyb.
+  - Chybové stavy: poškozený soubor, video bez řeči, bez obličeje (blur layout), chybějící/neplatný klíč (fail fast), výpadek LLM – vše se srozumitelnou hláškou.
+- Neověřeno: GPU profil (není GPU), kvalita výběru momentů s Claude (není API klíč), import z YouTube (síťová politika sandboxu nebyla zkoušena).
