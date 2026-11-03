@@ -69,7 +69,7 @@ export function PresetPicker({
 }) {
   const all = [...data.presets, ...data.user_presets]
   return (
-    <div className={cn("grid gap-3", compact ? "grid-cols-3 sm:grid-cols-4" : "grid-cols-2 sm:grid-cols-4 lg:grid-cols-7")}>
+    <div className={cn("grid gap-3", compact ? "grid-cols-3 sm:grid-cols-4" : "grid-cols-3 sm:grid-cols-5 lg:grid-cols-7")}>
       {all.map((p) => (
         <button
           key={p.id}
@@ -82,7 +82,7 @@ export function PresetPicker({
           )}
           title={p.description}
         >
-          <PresetPreview data={data} preset={p} width={compact ? 96 : 120} />
+          <PresetPreview data={data} preset={p} width={compact ? 88 : 100} />
           <span className="w-full truncate text-center text-xs font-medium">{p.name}</span>
         </button>
       ))}

@@ -45,7 +45,7 @@
       "id": "bold-pop",
       "name": "Bold Pop",
       "description": "Velká bílá slova s černým obrysem, aktivní slovo žlutě a vyskočí.",
-      "style": { "font": "montserrat-black", "font_size": 84, "uppercase": true, "highlight_color": "#FFD400", "outline_width": 7, "words_per_group": 3, "animation": "pop", "active_scale": 1.15 }
+      "style": { "font": "montserrat-black", "font_size": 94, "uppercase": true, "highlight_color": "#FFD400", "outline_width": 8, "words_per_group": 3, "animation": "pop", "active_scale": 1.15 }
     },
     {
       "id": "karaoke",

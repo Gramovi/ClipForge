@@ -272,7 +272,7 @@ def _choose_speaker(per_frame: list[dict[int, dict[str, float]]], fps: float) ->
     area = {tid: [fr[tid]["w"] * fr[tid]["h"] if tid in fr else 0.0 for fr in per_frame] for tid in ids}
     has_mouth = any(v is not None and v >= 0 for s in mouth.values() for v in s)
     half = max(2, int(fps * 0.7))
-    hold = max(2, int(fps * 1.2))
+    hold = max(2, int(fps * 0.8))
     chosen: list[int | None] = []
     cur: int | None = None
     challenger: int | None = None
@@ -403,5 +403,9 @@ def plan_crop(analysis: dict[str, Any], out_w: int, out_h: int, layout: str = "a
 
     speaker = _choose_speaker(per_frame, fps)
     faces = [fr.get(sp) if sp is not None else None for fr, sp in zip(per_frame, speaker, strict=True)]
+    # a change of the active speaker is a hard cut (like an editor would do), not a slow pan
+    for i in range(1, len(speaker)):
+        if speaker[i] is not None and speaker[i - 1] is not None and speaker[i] != speaker[i - 1]:
+            cuts[i] = True
     xs, ys = path_for(faces, cw, ch, 0.08)
     return CropPlan("track", cw, ch, times, xs, ys, face_ratio=face_ratio, speakers=len(main_tracks))

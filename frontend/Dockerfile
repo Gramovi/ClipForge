@@ -1,5 +1,9 @@
 FROM node:22-alpine AS deps
 WORKDIR /app
+# optional extra CA certificates (corporate TLS proxies) – see certs/README.md
+COPY certs/ /tmp/certs/
+RUN cat /tmp/certs/*.crt > /tmp/extra-ca.pem 2>/dev/null || true
+ENV NODE_EXTRA_CA_CERTS=/tmp/extra-ca.pem
 COPY frontend/package.json frontend/package-lock.json ./
 RUN npm ci
 

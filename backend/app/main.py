@@ -13,6 +13,8 @@ from app.api import assets, auth, clips, projects, uploads
 from app.config import get_settings
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+for _noisy in ("httpx", "httpx2", "huggingface_hub", "urllib3"):
+    logging.getLogger(_noisy).setLevel(logging.WARNING)
 
 app = FastAPI(title="ClipForge API", version="1.0.0")
 

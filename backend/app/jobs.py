@@ -151,6 +151,12 @@ def _run_pipeline(db: Session, project: Project, prog: Progress) -> None:
     st = get_storage()
     settings = dict(project.settings or {})
 
+    # ---- 0. fail fast on LLM misconfiguration (before hours of transcription) ----
+    provider = get_provider()  # raises LLMConfigError when e.g. the API key is missing
+    check = provider.check()
+    if not check.get("ok"):
+        raise LLMConfigError(str(check.get("message")))
+
     # ---- 1. source -------------------------------------------------------
     if project.source_type == "url" and not project.source_key:
         prog.set("upload", 0.0, "Stahuji video z odkazu…", force=True)
@@ -205,7 +211,6 @@ def _run_pipeline(db: Session, project: Project, prog: Progress) -> None:
 
     # ---- 3. moments -----------------------------------------------------------
     prog.set("moments", 0.0, "Hledám nejlepší momenty…", force=True)
-    provider = get_provider()
     usage: dict[str, Any] = {"provider": provider.name, "model": provider.model}
     try:
         res = finder.find_moments(
@@ -334,13 +339,22 @@ def export_zip(export_id: str) -> None:
             from app.services.clip_render import effective_edit, load_transcript
 
             transcript = load_transcript(project)
+            skipped: list[str] = []
             for n, clip in enumerate(clips):
                 if clip.dirty or clip.render_status != "ready" or not clip.video_key or not st.exists(clip.video_key):
                     ex.message = f"Renderuji klip {n + 1}/{len(clips)}…"
                     db.commit()
-                    render_clip(db, clip)
+                    try:
+                        render_clip(db, clip)
+                    except MediaError as e:  # one broken clip must not break the whole export
+                        db.rollback()
+                        clip.render_status, clip.render_error = "failed", str(e)
+                        skipped.append(clip.title)
                 ex.progress = round((n + 1) / len(clips) * 80, 1)
                 db.commit()
+            clips = [c for c in clips if c.render_status == "ready" and c.video_key and c.srt_key]
+            if not clips:
+                raise MediaError("Žádný klip se nepodařilo vyrenderovat.")
             key = f"{project_prefix(project.user_id, project.id)}/exports/{ex.id}.zip"
             zpath = st.local_path(key)
             ex.message = "Balím ZIP…"
@@ -357,7 +371,7 @@ def export_zip(export_id: str) -> None:
             ex.zip_key = key
             ex.status = "ready"
             ex.progress = 100.0
-            ex.message = "ZIP je připraven."
+            ex.message = "ZIP je připraven." + (f" Vynechané klipy (chyba renderu): {', '.join(skipped)}" if skipped else "")
             db.commit()
         except Exception as e:
             log.error("export %s failed: %s\n%s", export_id, e, traceback.format_exc())

@@ -1,7 +1,7 @@
 # GPU worker: CUDA 12 + cuDNN 9 for faster-whisper (CTranslate2). Use with `--profile gpu`.
 FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
 
-ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_BREAK_SYSTEM_PACKAGES=1 \
+ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_DEFAULT_TIMEOUT=120 PIP_RETRIES=10 PIP_BREAK_SYSTEM_PACKAGES=1 \
     SHARED_DIR=/app/shared DATA_DIR=/data WHISPER_MODELS_DIR=/models/whisper HF_HOME=/models/hf \
     FACE_MODEL_PATH=/app/models/face_landmarker.task YUNET_MODEL_PATH=/app/models/face_detection_yunet_2023mar.onnx \
     WHISPER_DEVICE=cuda
@@ -11,9 +11,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libgl1 libglib2.0-0 curl ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# optional extra CA certificates (corporate TLS proxies) – see certs/README.md
+COPY certs/ /tmp/certs/
+RUN for f in /tmp/certs/*.crt; do [ -f "$f" ] && cp "$f" /usr/local/share/ca-certificates/; done; update-ca-certificates >/dev/null 2>&1; rm -rf /tmp/certs
+ENV PIP_CERT=/etc/ssl/certs/ca-certificates.crt REQUESTS_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt \
+    SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt CURL_CA_BUNDLE=/etc/ssl/certs/ca-certificates.crt
+
 WORKDIR /app/backend
-COPY backend/requirements.txt .
-RUN pip3 install -r requirements.txt
+COPY backend/requirements.txt backend/requirements-mediapipe.txt ./
+RUN pip3 install -r requirements.txt && pip3 install --no-deps -r requirements-mediapipe.txt
 RUN mkdir -p /app/models \
  && curl -fsSL -o /app/models/face_landmarker.task \
       https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task \

@@ -95,6 +95,9 @@ def test_plan_active_speaker_by_mouth() -> None:
     c_early = plan.xs[20] + plan.crop_w / 2
     c_late = plan.xs[90] + plan.crop_w / 2
     assert c_early < 960 < c_late
+    # speaker change is a hard cut: at most one sample lies between the two framings
+    between = [x for x in plan.xs if plan.xs[20] + 50 < x < plan.xs[90] - 50]
+    assert len(between) <= 1
     split = plan_crop(_analysis(faces), 1080, 1920, "split")
     assert split.layout == "split" and split.xs2 is not None
 

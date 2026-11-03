@@ -17,8 +17,8 @@ export const viewport: Viewport = { themeColor: "#14151c", width: "device-width"
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="cs" className="dark">
-      <body className={`${GeistSans.variable} ${GeistMono.variable} bg-forge min-h-dvh antialiased`}>
+    <html lang="cs" className={`dark ${GeistSans.variable} ${GeistMono.variable}`}>
+      <body className="bg-forge min-h-dvh font-sans antialiased">
         <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
         <Toaster richColors position="top-center" />
       </body>

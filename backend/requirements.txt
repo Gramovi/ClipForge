@@ -15,7 +15,15 @@ anthropic>=2.4,<3
 httpx==0.28.1
 requests>=2.32
 pillow>=11.0
-faster-whisper==1.1.1
-mediapipe==0.10.21
+faster-whisper==1.2.1
+av>=11,<16
+# MediaPipe is installed with --no-deps (see requirements-mediapipe.txt) to avoid pulling
+# jax/jaxlib/scipy (~450 MB) which the face landmarker does not need. Its real runtime deps:
+opencv-contrib-python==4.11.0.86
+absl-py>=2.1
+attrs>=23
+flatbuffers>=24
+protobuf>=4.25.3,<5
+matplotlib>=3.8
 numpy<2.1
 yt-dlp>=2025.1.1

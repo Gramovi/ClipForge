@@ -20,5 +20,6 @@ def get_provider(settings: Settings | None = None) -> LLMProvider:
     if s.llm_provider == "ollama":
         from app.llm.ollama_provider import OllamaProvider
 
-        return OllamaProvider(s.ollama_base_url, s.ollama_model, s.ollama_num_ctx, s.llm_timeout_seconds)
+        # local models on CPU can need much longer per window than hosted APIs
+        return OllamaProvider(s.ollama_base_url, s.ollama_model, s.ollama_num_ctx, max(s.llm_timeout_seconds, 1800))
     raise LLMConfigError(f"Neznámý LLM_PROVIDER: {s.llm_provider} (povoleno: anthropic, ollama)")

@@ -197,10 +197,14 @@ def _snapshot(project_id: str, user_id: str) -> dict[str, Any] | None:
 
 
 @router.get("/projects/{project_id}/events")
-async def project_events(project_id: str, request: Request, db: DB, user: CurrentUser) -> StreamingResponse:
-    """Server-Sent Events with live progress. The pipeline runs in the worker; this only reads state."""
-    owned_project(db, user, project_id)
+async def project_events(project_id: str, request: Request, user: CurrentUser) -> StreamingResponse:
+    """Server-Sent Events with live progress. The pipeline runs in the worker; this only reads state.
+
+    Uses a short-lived DB session per poll so long-lived streams don't hold pooled connections.
+    """
     uid = user.id
+    if await asyncio.to_thread(_snapshot, project_id, uid) is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Projekt nenalezen.")
 
     async def gen() -> AsyncIterator[str]:
         last = None
