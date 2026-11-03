@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import json
 import subprocess
 from pathlib import Path
@@ -74,7 +75,7 @@ def test_plan_follows_face_smoothly() -> None:
     xs = plan.xs
     centers = [x + plan.crop_w / 2 for x in xs]
     assert centers[10] < centers[-10]
-    steps = [abs(b - a) for a, b in zip(xs, xs[1:], strict=False)]
+    steps = [abs(b - a) for a, b in itertools.pairwise(xs)]
     assert max(steps) < 60  # no jumps between 0.2 s samples
     # the face stays inside the crop
     for i, c in enumerate(centers):

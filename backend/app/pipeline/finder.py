@@ -17,7 +17,7 @@ from app.config import Settings, get_settings
 from app.llm import LLMConfigError, LLMError, LLMProvider, LLMRefusalError, LLMTransientError
 from app.llm.jsonfix import JSONRepairError, parse_json_loose
 from app.llm.pricing import cost
-from app.llm.prompts import CLIP_SCHEMA, REPAIR_PROMPT, SYSTEM_PROMPT, build_user_prompt
+from app.llm.prompts import CLIP_SCHEMA, MORE_PROMPT, REPAIR_PROMPT, SYSTEM_PROMPT, build_user_prompt
 from app.pipeline.moments import (
     LENGTH_RANGES,
     ClipCandidate,
@@ -31,6 +31,9 @@ from app.pipeline.moments import (
 )
 
 log = logging.getLogger(__name__)
+
+LOCAL_MIN_CLIPS = 3  # ask local models for more moments when they return fewer
+LOCAL_MAX_WINDOW_MIN = 6.0  # small local models handle shorter excerpts much better
 
 
 class _Scores(BaseModel):
@@ -183,7 +186,18 @@ def _call_window(
             log.warning("window %d invalid JSON (%s), asking again", window.index, e)
             prompt = base_prompt + "\n\n" + REPAIR_PROMPT.format(error=str(e)[:200])
             continue
-        return [_to_candidate(c) for c in clips], in_tok, out_tok
+        result = [_to_candidate(c) for c in clips]
+        if provider.is_local and len(result) < LOCAL_MIN_CLIPS:
+            # small local models tend to stop after one or two moments -> ask once for more
+            found = "\n".join(f"- [{c.start:.2f}-{c.end:.2f}] {c.title}" for c in result) or "- (none)"
+            try:
+                more = provider.complete_json(SYSTEM_PROMPT, base_prompt + "\n\n" + MORE_PROMPT.format(found=found), CLIP_SCHEMA)
+                in_tok += more.input_tokens
+                out_tok += more.output_tokens
+                result += [_to_candidate(c) for c in parse_clips(more.text, window)]
+            except (LLMTransientError, JSONRepairError) as e:
+                log.info("window %d: follow-up request failed (%s), keeping first answer", window.index, e)
+        return result, in_tok, out_tok
     raise LLMError(f"Okno {window.index + 1}: {last_err}")
 
 
@@ -200,7 +214,10 @@ def find_moments(
     sleep: Callable[[float], None] = time.sleep,
 ) -> FinderResult:
     s = settings or get_settings()
-    windows = split_windows(words, s.llm_window_minutes * 60, s.llm_window_overlap_minutes * 60)
+    win_min, overlap_min = s.llm_window_minutes, s.llm_window_overlap_minutes
+    if provider.is_local and win_min > LOCAL_MAX_WINDOW_MIN:
+        win_min, overlap_min = LOCAL_MAX_WINDOW_MIN, min(overlap_min, 1.0)
+    windows = split_windows(words, win_min * 60, overlap_min * 60)
     result = FinderResult(candidates=[], windows=len(windows))
     if not windows:
         return result

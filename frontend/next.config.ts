@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
   experimental: {
     // long-running proxied requests (upload chunks on slow links, SSE streams)
     proxyTimeout: 30 * 60 * 1000,
+    // upload chunks pass through the proxy; the default 10 MB limit would truncate them
+    middlewareClientMaxBodySize: "64mb",
   },
 }
 

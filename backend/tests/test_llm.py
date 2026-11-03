@@ -145,7 +145,7 @@ def test_anthropic_error_mapping(code: int, exc: type[Exception]) -> None:
 def test_ollama_provider(monkeypatch: pytest.MonkeyPatch) -> None:
     calls: list[dict[str, Any]] = []
 
-    def fake_post(url: str, json: dict[str, Any], timeout: Any) -> httpx.Response:  # noqa: A002
+    def fake_post(url: str, json: dict[str, Any], timeout: Any) -> httpx.Response:
         calls.append(json)
         return httpx.Response(200, json={"message": {"content": '{"clips": []}'}, "prompt_eval_count": 10, "eval_count": 5},
                               request=httpx.Request("POST", url))
@@ -251,3 +251,11 @@ def test_find_moments_partial_failure_warns() -> None:
                        settings=Settings(llm_max_retries=2, llm_window_minutes=10, llm_concurrency=1), sleep=lambda s: None)
     assert res.failed_windows >= 1 and res.warnings
     assert len(res.candidates) >= 1
+
+
+def test_local_provider_gets_shorter_windows_and_follow_up() -> None:
+    prov = FakeProvider([clip_for_window], local=True)
+    res = find_moments(words_long(), language="cs", length="30-60", focus=None, provider=prov,
+                       settings=Settings(llm_window_minutes=12, llm_concurrency=1), sleep=lambda s: None)
+    assert res.windows >= 3  # 6-minute windows instead of 12
+    assert any("ADDITIONAL" in p for p in prov.prompts), "follow-up request for more moments"

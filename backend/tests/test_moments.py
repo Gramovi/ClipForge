@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import itertools
+
 from app.pipeline.moments import (
     ClipCandidate,
     align_clip,
@@ -50,7 +52,7 @@ def test_windows_cover_everything_with_overlap() -> None:
     assert len(windows) >= 3
     assert windows[0].i0 == 0
     assert windows[-1].i1 == len(words) - 1
-    for a, b in zip(windows, windows[1:], strict=False):
+    for a, b in itertools.pairwise(windows):
         assert b.start < a.end, "consecutive windows must overlap"
         assert a.end - b.start >= 60
         assert b.start > a.start

@@ -118,16 +118,16 @@ export function CaptionOverlay({
                 const next = j + 1 < group.words.length ? group.words[j + 1].s : w.e
                 const dur = Math.max(0.05, next - w.s)
                 const p = Math.max(0, Math.min(1, (time - w.s) / dur)) * 100
+                // two layers like libass \kf: base text + highlight colour revealed left-to-right
                 content = (
-                  <span
-                    style={{
-                      backgroundImage: `linear-gradient(90deg, ${style.highlight_color} ${p}%, ${style.text_color} ${p}%)`,
-                      WebkitBackgroundClip: "text",
-                      backgroundClip: "text",
-                      color: "transparent",
-                    }}
-                  >
+                  <span style={{ position: "relative", display: "inline-block", color: style.text_color }}>
                     {t}
+                    <span
+                      aria-hidden
+                      style={{ position: "absolute", left: 0, top: 0, color: style.highlight_color, clipPath: `inset(0 ${100 - p}% 0 0)` }}
+                    >
+                      {t}
+                    </span>
                   </span>
                 )
               } else if (style.gradient?.enabled) {

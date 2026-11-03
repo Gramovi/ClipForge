@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     # --- uploads ------------------------------------------------------------
     max_upload_bytes: int = 5 * 1024**3  # 5 GB
-    upload_chunk_bytes: int = 16 * 1024**2  # 16 MB (suggested to the client)
+    upload_chunk_bytes: int = 8 * 1024**2  # 8 MB (suggested to the client)
     max_video_seconds: int = 4 * 3600
     allow_url_import: bool = True
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import itertools
 import re
 
 from app.pipeline import captions
@@ -64,7 +65,7 @@ def test_grouping_respects_words_per_group_and_sentences() -> None:
     groups = group_words(words, style, 1080, 1920)
     assert all(1 <= len(g.words) <= 3 for g in groups)
     assert groups[1].words[-1]["w"] == "pět."  # sentence end closes a group
-    for a, b in zip(groups, groups[1:], strict=False):
+    for a, b in itertools.pairwise(groups):
         assert a.end <= b.start + 1e-6
 
 
@@ -128,7 +129,7 @@ def test_filler_removal_and_timemap() -> None:
     assert "ehm," not in texts and "jako," not in texts
     assert not tm.trivial and tm.duration < words[-1]["e"] + 0.2
     mapped = map_words(kept, tm)
-    assert all(b["s"] >= a["s"] for a, b in zip(mapped, mapped[1:], strict=False))
+    assert all(b["s"] >= a["s"] for a, b in itertools.pairwise(mapped))
     assert mapped[-1]["e"] <= tm.duration + 1e-6
 
 

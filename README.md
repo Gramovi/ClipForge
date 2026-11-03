@@ -46,7 +46,7 @@ docker compose --profile gpu up --build --scale worker=0   # Whisper na NVIDIA G
 
 ## Jak to funguje
 
-1. **Nahrání** – drag & drop, obnovitelný chunked upload (16 MB části, až 5 GB; při výpadku spojení
+1. **Nahrání** – drag & drop, obnovitelný chunked upload (8 MB části, až 5 GB; při výpadku spojení
    nebo zavření stránky se naváže tam, kde přestal), nebo odkaz (YouTube apod. přes yt-dlp – jen vlastní
    obsah nebo obsah, ke kterému máte práva).
 2. **Nastavení** – délka klipů (Auto / <30 s / 30–60 s / 60–90 s / 90 s–3 min), poměr stran (9:16, 1:1, 16:9),

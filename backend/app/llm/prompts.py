@@ -117,3 +117,10 @@ def build_user_prompt(
 
 REPAIR_PROMPT = """Your previous answer was not valid JSON for the required schema ({error}). \
 Answer again with ONLY a JSON object of the form {{"clips": [ ... ]}} following all the rules."""
+
+
+MORE_PROMPT = """You already selected these moments from this excerpt:
+{found}
+
+Now find ADDITIONAL strong moments from the same excerpt that do NOT overlap with the ones above. \
+Follow all the rules. If there are no other good moments, return {{"clips": []}}."""
