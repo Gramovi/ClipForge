@@ -1,0 +1,17 @@
+.env
+.env.*
+!.env.example
+**/.venv/
+**/__pycache__/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.pytest_cache/
+backend/data/
+backend/models/
+frontend/node_modules/
+frontend/.next/
+frontend/test-results/
+frontend/playwright-report/
+frontend/e2e/.auth/
+test-media/
+*.log

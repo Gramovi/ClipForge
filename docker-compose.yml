@@ -1,0 +1,122 @@
+# ClipForge – one command: `docker compose up --build`  ->  http://localhost:3000
+# Optional profiles:  --profile ollama  (local LLM)   --profile gpu  (CUDA worker for Whisper)
+
+x-backend: &backend
+  build:
+    context: .
+    dockerfile: backend/Dockerfile
+  image: clipforge-backend
+  env_file:
+    - path: .env
+      required: false
+  environment: &backend-env
+    DATABASE_URL: postgresql+psycopg://clipforge:clipforge@postgres:5432/clipforge
+    REDIS_URL: redis://redis:6379/0
+    DATA_DIR: /data
+    OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://ollama:11434}
+    CORS_ORIGINS: ${PUBLIC_URL:-http://localhost:3000}
+  volumes:
+    - media:/data
+    - models:/models
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+  restart: unless-stopped
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: clipforge
+      POSTGRES_PASSWORD: clipforge
+      POSTGRES_DB: clipforge
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clipforge"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+    restart: unless-stopped
+
+  api:
+    <<: *backend
+    ports:
+      - "${API_PORT:-8000}:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+
+  # long pipelines (transcription, moment finding, rendering of a whole project)
+  worker:
+    <<: *backend
+    command: ["python", "-m", "app.worker", "process"]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  # short jobs from the editor (single-clip re-render, ZIP export) stay responsive
+  render-worker:
+    <<: *backend
+    command: ["python", "-m", "app.worker", "render"]
+    depends_on:
+      api:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        API_URL: http://api:8000
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    volumes:
+      - ollama:/root/.ollama
+    restart: unless-stopped
+
+  worker-gpu:
+    <<: *backend
+    profiles: ["gpu"]
+    build:
+      context: .
+      dockerfile: backend/Dockerfile.gpu
+    image: clipforge-backend-gpu
+    command: ["python3", "-m", "app.worker", "process"]
+    environment:
+      <<: *backend-env
+      WHISPER_DEVICE: cuda
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+volumes:
+  pgdata:
+  media:
+  models:
+  ollama:

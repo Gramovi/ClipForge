@@ -1,0 +1,33 @@
+[project]
+name = "clipforge-backend"
+version = "1.0.0"
+requires-python = ">=3.12"
+
+[tool.ruff]
+line-length = 140
+target-version = "py312"
+extend-exclude = ["alembic/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "SIM", "RUF"]
+ignore = ["S101", "S603", "S607", "S311", "RUF001", "RUF002", "RUF003", "B008", "S104", "S324"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S105", "S106"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+warn_unused_ignores = false
+disallow_untyped_calls = false
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["mediapipe.*", "yt_dlp.*", "rq.*", "faster_whisper.*", "ctranslate2.*", "cv2.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
+markers = ["slow: renders real video with ffmpeg"]

@@ -1,0 +1,138 @@
+{
+  "version": 1,
+  "notes": "Single source of truth for caption styles. Read by the Python ASS renderer and by the browser preview. Sizes are in pixels at a 1080 px short side and are scaled to the output resolution. Colors are #RRGGBB, opacities 0..1.",
+  "fonts": [
+    { "id": "montserrat-black", "label": "Montserrat Black", "family": "Montserrat Black", "file": "Montserrat-900.ttf", "weight": 900 },
+    { "id": "montserrat-extrabold", "label": "Montserrat ExtraBold", "family": "Montserrat ExtraBold", "file": "Montserrat-800.ttf", "weight": 800 },
+    { "id": "poppins-extrabold", "label": "Poppins ExtraBold", "family": "Poppins ExtraBold", "file": "Poppins-800.ttf", "weight": 800 },
+    { "id": "inter-extrabold", "label": "Inter ExtraBold", "family": "Inter ExtraBold", "file": "Inter-800.ttf", "weight": 800 },
+    { "id": "bebas-neue", "label": "Bebas Neue", "family": "Bebas Neue", "file": "BebasNeue-400.ttf", "weight": 400 },
+    { "id": "anton", "label": "Anton", "family": "Anton", "file": "Anton-400.ttf", "weight": 400 },
+    { "id": "oswald-bold", "label": "Oswald Bold", "family": "Oswald", "file": "Oswald-700.ttf", "weight": 700 },
+    { "id": "bangers", "label": "Bangers", "family": "Bangers", "file": "Bangers-400.ttf", "weight": 400 },
+    { "id": "roboto-bold", "label": "Roboto Bold", "family": "Roboto", "file": "Roboto-700.ttf", "weight": 700 },
+    { "id": "archivo-black", "label": "Archivo Black", "family": "Archivo Black", "file": "ArchivoBlack-400.ttf", "weight": 400 },
+    { "id": "rubik-extrabold", "label": "Rubik ExtraBold", "family": "Rubik ExtraBold", "file": "Rubik-800.ttf", "weight": 800 },
+    { "id": "nunito-black", "label": "Nunito Black", "family": "Nunito Black", "file": "Nunito-900.ttf", "weight": 900 },
+    { "id": "space-mono-bold", "label": "Space Mono Bold", "family": "Space Mono", "file": "SpaceMono-700.ttf", "weight": 700 }
+  ],
+  "defaults": {
+    "font": "montserrat-black",
+    "font_size": 78,
+    "uppercase": false,
+    "letter_spacing": 0,
+    "text_color": "#FFFFFF",
+    "highlight_color": "#FFD400",
+    "highlight_mode": "active_word",
+    "outline_color": "#000000",
+    "outline_width": 5,
+    "shadow_color": "#000000",
+    "shadow_opacity": 0.6,
+    "shadow_depth": 3,
+    "background": { "enabled": false, "color": "#000000", "opacity": 0.6, "padding": 18 },
+    "glow": { "enabled": false, "color": "#00E5FF", "strength": 8 },
+    "gradient": { "enabled": false, "from": "#FF8A00", "to": "#FF2E93" },
+    "position": "bottom",
+    "offset_y": 0,
+    "words_per_group": 3,
+    "animation": "pop",
+    "active_scale": 1.12,
+    "emoji": false,
+    "rotation": 0
+  },
+  "presets": [
+    {
+      "id": "bold-pop",
+      "name": "Bold Pop",
+      "description": "Velká bílá slova s černým obrysem, aktivní slovo žlutě a vyskočí.",
+      "style": { "font": "montserrat-black", "font_size": 84, "uppercase": true, "highlight_color": "#FFD400", "outline_width": 7, "words_per_group": 3, "animation": "pop", "active_scale": 1.15 }
+    },
+    {
+      "id": "karaoke",
+      "name": "Karaoke",
+      "description": "Text se postupně vybarvuje podle toho, jak zazní.",
+      "style": { "font": "poppins-extrabold", "font_size": 72, "text_color": "#FFFFFF", "highlight_color": "#2BFF88", "highlight_mode": "karaoke", "outline_width": 5, "words_per_group": 4, "animation": "none" }
+    },
+    {
+      "id": "minimal",
+      "name": "Minimal",
+      "description": "Malé, čisté titulky s jemným stínem.",
+      "style": { "font": "inter-extrabold", "font_size": 52, "highlight_mode": "none", "outline_width": 0, "shadow_depth": 2, "shadow_opacity": 0.75, "words_per_group": 4, "animation": "fade", "position": "bottom", "offset_y": -2 }
+    },
+    {
+      "id": "neon-glow",
+      "name": "Neon Glow",
+      "description": "Zářivý neonový obrys, aktivní slovo v růžovém světle.",
+      "style": { "font": "rubik-extrabold", "font_size": 80, "uppercase": true, "text_color": "#FFFFFF", "outline_color": "#00E5FF", "outline_width": 4, "highlight_color": "#FF3DF2", "glow": { "enabled": true, "color": "#00E5FF", "strength": 10 }, "shadow_depth": 0, "words_per_group": 2, "animation": "pop" }
+    },
+    {
+      "id": "box",
+      "name": "Box",
+      "description": "Slova v barevném boxu, aktivní slovo zvýrazněné.",
+      "style": { "font": "archivo-black", "font_size": 66, "uppercase": true, "text_color": "#FFFFFF", "highlight_color": "#FFE600", "outline_width": 0, "shadow_depth": 0, "background": { "enabled": true, "color": "#7A2BFF", "opacity": 0.92, "padding": 16 }, "words_per_group": 3, "animation": "none" }
+    },
+    {
+      "id": "typewriter",
+      "name": "Typewriter",
+      "description": "Text se vypisuje písmeno po písmenu jako na psacím stroji.",
+      "style": { "font": "space-mono-bold", "font_size": 60, "text_color": "#F5F5F5", "highlight_mode": "none", "outline_width": 3, "background": { "enabled": true, "color": "#111111", "opacity": 0.7, "padding": 14 }, "words_per_group": 4, "animation": "typewriter" }
+    },
+    {
+      "id": "bounce",
+      "name": "Bounce",
+      "description": "Aktivní slovo pružně vyskočí.",
+      "style": { "font": "poppins-extrabold", "font_size": 82, "uppercase": false, "highlight_color": "#4DD2FF", "outline_width": 6, "words_per_group": 2, "animation": "bounce", "active_scale": 1.25 }
+    },
+    {
+      "id": "gradient",
+      "name": "Gradient",
+      "description": "Písmena v barevném přechodu oranžová → růžová.",
+      "style": { "font": "montserrat-black", "font_size": 86, "uppercase": true, "highlight_mode": "none", "gradient": { "enabled": true, "from": "#FFB800", "to": "#FF2E93" }, "outline_color": "#1A0B2E", "outline_width": 6, "words_per_group": 2, "animation": "pop" }
+    },
+    {
+      "id": "comic",
+      "name": "Comic",
+      "description": "Komiksové písmo, žlutá slova, tvrdý stín a mírné natočení.",
+      "style": { "font": "bangers", "font_size": 96, "uppercase": true, "text_color": "#FFE14D", "highlight_color": "#FF3B30", "outline_width": 7, "shadow_depth": 7, "shadow_opacity": 1, "letter_spacing": 2, "rotation": -3, "words_per_group": 2, "animation": "bounce", "active_scale": 1.18 }
+    },
+    {
+      "id": "podcast-clean",
+      "name": "Podcast Clean",
+      "description": "Klidné titulky v tmavém poloprůhledném pruhu.",
+      "style": { "font": "inter-extrabold", "font_size": 54, "text_color": "#FFFFFF", "highlight_color": "#9AD0FF", "outline_width": 0, "shadow_depth": 0, "background": { "enabled": true, "color": "#000000", "opacity": 0.55, "padding": 16 }, "words_per_group": 4, "animation": "none", "position": "bottom", "offset_y": -1 }
+    },
+    {
+      "id": "emoji",
+      "name": "Emoji",
+      "description": "Automatické emoji ke klíčovým slovům nad titulky.",
+      "style": { "font": "nunito-black", "font_size": 80, "uppercase": false, "highlight_color": "#FFD400", "outline_width": 6, "words_per_group": 3, "animation": "pop", "emoji": true }
+    },
+    {
+      "id": "highlight-keywords",
+      "name": "Highlight Keywords",
+      "description": "AI vybere klíčová slova a zvýrazní je barvou.",
+      "style": { "font": "montserrat-black", "font_size": 80, "uppercase": true, "highlight_mode": "keywords", "highlight_color": "#39FF6A", "outline_width": 6, "words_per_group": 3, "animation": "pop", "active_scale": 1.08 }
+    },
+    {
+      "id": "cinema",
+      "name": "Cinema",
+      "description": "Úzké filmové písmo Bebas Neue se stínem, prolínání.",
+      "style": { "font": "bebas-neue", "font_size": 100, "uppercase": true, "letter_spacing": 3, "highlight_mode": "none", "outline_width": 0, "shadow_depth": 4, "shadow_opacity": 0.85, "words_per_group": 4, "animation": "fade" }
+    },
+    {
+      "id": "impact-green",
+      "name": "Impact Green",
+      "description": "Úderné písmo Anton, aktivní slovo zeleně.",
+      "style": { "font": "anton", "font_size": 92, "uppercase": true, "highlight_color": "#23E06C", "outline_width": 6, "shadow_depth": 4, "words_per_group": 1, "animation": "pop", "active_scale": 1.0 }
+    }
+  ],
+  "hook": {
+    "font": "montserrat-black",
+    "font_size": 74,
+    "text_color": "#111111",
+    "background_color": "#FFFFFF",
+    "background_opacity": 0.95,
+    "duration": 3.0,
+    "position_y": 0.16
+  }
+}

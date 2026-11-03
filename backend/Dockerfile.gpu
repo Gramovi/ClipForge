@@ -1,0 +1,26 @@
+# GPU worker: CUDA 12 + cuDNN 9 for faster-whisper (CTranslate2). Use with `--profile gpu`.
+FROM nvidia/cuda:12.6.3-cudnn-runtime-ubuntu24.04
+
+ENV DEBIAN_FRONTEND=noninteractive PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_BREAK_SYSTEM_PACKAGES=1 \
+    SHARED_DIR=/app/shared DATA_DIR=/data WHISPER_MODELS_DIR=/models/whisper HF_HOME=/models/hf \
+    FACE_MODEL_PATH=/app/models/face_landmarker.task YUNET_MODEL_PATH=/app/models/face_detection_yunet_2023mar.onnx \
+    WHISPER_DEVICE=cuda
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3 python3-pip python3-venv ffmpeg fontconfig fonts-noto-color-emoji fonts-dejavu-core \
+        libgl1 libglib2.0-0 curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app/backend
+COPY backend/requirements.txt .
+RUN pip3 install -r requirements.txt
+RUN mkdir -p /app/models \
+ && curl -fsSL -o /app/models/face_landmarker.task \
+      https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task \
+ && curl -fsSL -o /app/models/face_detection_yunet_2023mar.onnx \
+      https://media.githubusercontent.com/media/opencv/opencv_zoo/main/models/face_detection_yunet/face_detection_yunet_2023mar.onnx
+COPY shared /app/shared
+RUN mkdir -p /usr/local/share/fonts/clipforge && cp /app/shared/fonts/*.ttf /usr/local/share/fonts/clipforge/ && fc-cache -f
+COPY backend /app/backend
+RUN mkdir -p /data /models
+CMD ["python3", "-m", "app.worker", "process"]
