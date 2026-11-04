@@ -5,8 +5,6 @@ co nejvíc kvalitních krátkých klipů pro TikTok, Instagram Reels a YouTube S
 momenty, ohodnotí je Virality Score, ořízne obraz na mluvčího, přidá animované titulky a vyexportuje
 video v plné kvalitě.
 
-> Aplikace žije v adresáři `clipforge/` tohoto repozitáře (kořen repozitáře obsahuje jiný, nesouvisející projekt).
-
 ## Obsah
 
 - [Rychlý start](#rychlý-start)
@@ -25,7 +23,8 @@ video v plné kvalitě.
 Potřebujete jen Docker (Docker Desktop nebo Docker Engine + Compose v2).
 
 ```bash
-cd clipforge
+git clone https://github.com/Gramovi/ClipForge.git
+cd ClipForge
 cp .env.example .env          # doplňte ANTHROPIC_API_KEY (nebo přepněte na Ollama, viz níže)
 docker compose up --build
 ```
@@ -99,7 +98,7 @@ docker compose --profile gpu up --build --scale worker=0   # Whisper na NVIDIA G
 
 1. Založte účet na <https://console.anthropic.com/> a nastavte platby (Billing).
 2. V **Settings → API Keys** vytvořte klíč.
-3. Vložte ho do `clipforge/.env`:
+3. Vložte ho do souboru `.env` v kořeni projektu:
    ```
    LLM_PROVIDER=anthropic
    ANTHROPIC_API_KEY=sk-ant-...
@@ -220,7 +219,7 @@ Rozhodnutí a jejich důvody:
 Struktura:
 
 ```
-clipforge/
+ClipForge/
 ├─ backend/        FastAPI, worker, pipeline (app/pipeline/*), LLM vrstva (app/llm/*), testy, Alembic
 ├─ frontend/       Next.js aplikace, Playwright E2E (e2e/)
 ├─ shared/         caption-presets.json, emoji-keywords.json, fonty (OFL)
@@ -233,7 +232,7 @@ clipforge/
 Backend (Python 3.12, FFmpeg s libass):
 
 ```bash
-cd clipforge/backend
+cd backend
 python3.12 -m venv .venv
 .venv/bin/pip install -r requirements-dev.txt
 .venv/bin/pip install --no-deps -r requirements-mediapipe.txt
@@ -252,7 +251,7 @@ Lokální běh bez Dockeru (Postgres + Redis musí běžet):
 Frontend:
 
 ```bash
-cd clipforge/frontend
+cd frontend
 npm ci
 npm run dev                         # API_URL=http://localhost:8000
 npm run lint && npx tsc --noEmit && npm run build

@@ -79,7 +79,7 @@ Legenda: `[x]` hotovo a otestováno, `[ ]` zbývá, `[~]` částečně (viz pozn
 - [x] Commit + push
 
 ## Poznámky / rozhodnutí
-- Aplikace žije v podadresáři `clipforge/`, protože kořen repozitáře obsahuje jinou (nesouvisející) aplikaci.
+- Vývoj začal v podadresáři `clipforge/` repozitáře gramovi/clipmaster; historie byla přenesena sem (git subtree split).
 - YuNet (OpenCV) detekuje obličeje, MediaPipe FaceLandmarker jen měří ústa na výřezu – samotný MediaPipe
   v širokém záběru obličeje nenajde (detektor je jen „short range“).
 - MediaPipe se instaluje `--no-deps` (bez jax/scipy, −450 MB).
